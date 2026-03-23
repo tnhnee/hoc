@@ -3,170 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bàn 1: Elite Study 🏆</title>
+    <title>Elite Study Bàn 1 🏆</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@500&display=swap');
-        
-        :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #3b82f6;
-            --success: #22c55e;
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg); 
-            color: #f8fafc;
-            overflow: hidden;
-        }
-
-        /* Thanh trạng thái Cloud gọn gàng */
-        #sync-status {
-            font-size: 9px;
-            letter-spacing: 0.15em;
-            color: #94a3b8;
-        }
-
-        /* Cột tên cố định - Hiệu ứng Glassmorphism */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; overflow: hidden; }
         .sticky-name { 
             position: sticky; left: 0; z-index: 100; 
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(8px);
-            min-width: 120px; 
-            padding: 15px;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            background: #020617; min-width: 120px; padding: 15px;
+            border-right: 2px solid #3b82f6;
         }
-
-        /* Ô số ngày - Tinh tế hơn */
         .cell { 
-            min-width: 44px; height: 44px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-family: 'JetBrains Mono', monospace; 
-            border-radius: 12px;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
-            transition: 0.3s all;
+            min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
+            font-family: 'JetBrains Mono', monospace; border-radius: 12px; font-size: 14px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2); flex-shrink: 0; transition: 0.3s;
         }
-        
         .cell-done { 
-            background: linear-gradient(135deg, #22c55e, #16a34a); 
-            color: white !important; 
-            border: none;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, #22c55e, #16a34a); color: white !important; 
+            border: none; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); 
         }
-
-        .cell-miss { 
-            background: rgba(239, 68, 68, 0.1); 
-            color: #ef4444; 
-            border: 1px solid rgba(239, 68, 68, 0.2); 
-        }
-
-        .scroll-container { overflow-x: auto; scroll-behavior: smooth; }
         .scroll-container::-webkit-scrollbar { display: none; }
-        
-        /* Hiệu ứng lửa chiến thần */
-        .fire-anim { 
-            animation: glow-fire 1.5s infinite alternate;
-        }
-        @keyframes glow-fire {
-            from { filter: drop-shadow(0 0 2px #f97316); transform: scale(1); }
-            to { filter: drop-shadow(0 0 8px #f97316); transform: scale(1.1); }
-        }
-
-        .btn-main {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            transition: 0.3s;
-            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
-        }
-        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
-        .btn-main:disabled { background: #334155; box-shadow: none; color: #64748b; }
-
-        #loading-bar { position: fixed; top: 0; left: 0; height: 2px; background: #3b82f6; width: 0%; z-index: 999; transition: 0.3s; }
+        .fire-anim { animation: glow-fire 1.5s infinite alternate; }
+        @keyframes glow-fire { from { filter: drop-shadow(0 0 2px #f97316); transform: scale(1); } to { filter: drop-shadow(0 0 8px #f97316); transform: scale(1.1); } }
+        .btn-main { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .btn-main:disabled { background: #1e293b; color: #64748b; opacity: 0.5; cursor: not-allowed; }
+        #loading-bar { position: fixed; top: 0; left: 0; height: 3px; background: #3b82f6; width: 0%; z-index: 999; transition: 0.3s; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
     <div id="loading-bar"></div>
-
     <header class="p-6 flex flex-col gap-4">
         <div class="flex justify-between items-start">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tighter italic">BÀN 1 <span class="text-blue-500">STUDY</span></h1>
-                <p id="sync-status" class="uppercase mt-1">SỬ DỤNG DỮ LIỆU ĐÁM MÂY</p>
+                <p id="sync-status" class="text-[9px] uppercase mt-1 tracking-widest text-slate-500 italic font-bold">Connecting JSONBin...</p>
             </div>
-            <div class="bg-slate-800/50 border border-white/5 rounded-2xl p-3 text-center min-w-[80px]">
+            <div class="bg-slate-900 border border-white/5 rounded-2xl p-3 text-center">
                 <div id="countdown-num" class="text-2xl font-black text-blue-400">--</div>
-                <div class="text-[7px] uppercase font-bold text-slate-500">Ngày tới 11/06</div>
+                <div class="text-[7px] uppercase font-bold text-slate-600">Ngày tới 11/06</div>
             </div>
         </div>
-
-        <button id="btn-checkin" onclick="doCheckIn()" class="btn-main w-full py-4 rounded-2xl font-bold text-lg tracking-widest disabled:opacity-50">
-            ĐIỂM DANH NGAY 🔥
+        <button id="btn-checkin" onclick="doCheckIn()" class="btn-main w-full py-4 rounded-2xl font-bold text-lg tracking-widest transition-all active:scale-95 text-white">
+            ĐIỂM DANH 🔥
         </button>
     </header>
 
     <div class="flex justify-between px-6 mb-2">
-        <button onclick="scrollTable(-150)" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-xl"> ‹ </button>
-        <button onclick="scrollTable(150)" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-xl"> › </button>
+        <button onclick="scrollTable(-150)" class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-xl shadow-lg border border-white/5"> ‹ </button>
+        <button onclick="scrollTable(150)" class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-xl shadow-lg border border-white/5"> › </button>
     </div>
 
     <main class="flex-1 overflow-hidden">
-        <div class="h-full scroll-container px-4" id="table-container">
+        <div class="h-full overflow-x-auto px-4" id="table-container" style="scroll-behavior: smooth;">
             <table class="w-full border-separate border-spacing-y-4">
                 <tbody id="main-table-body"></tbody>
             </table>
         </div>
     </main>
 
-    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-[200] flex items-center justify-center p-8">
-        <div class="w-full max-w-sm">
-            <div class="mb-10 text-center">
-                <div class="inline-block p-4 bg-blue-600/10 rounded-3xl mb-4 border border-blue-500/20">
-                    <span class="text-4xl">⚡</span>
-                </div>
-                <h2 class="text-3xl font-black italic">ELITE <span class="text-blue-500">CLUB</span></h2>
-                <p class="text-slate-500 text-[10px] tracking-[0.4em] uppercase mt-2">Đăng nhập để tiếp tục</p>
-            </div>
-            <input type="password" id="pass-input" placeholder="••••" class="w-full bg-slate-900 border border-white/10 p-5 rounded-2xl text-center text-3xl mb-4 focus:border-blue-500 outline-none transition-all">
-            <button onclick="checkLogin()" class="btn-main w-full py-5 rounded-2xl font-black text-lg">XÁC NHẬN</button>
+    <div id="login-screen" class="fixed inset-0 bg-[#020617] z-[200] flex items-center justify-center p-8">
+        <div class="w-full max-w-sm text-center">
+            <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tighter">Elite <span class="text-blue-500">Club</span></h2>
+            <p class="text-slate-500 text-[10px] tracking-[0.4em] uppercase mb-8">Kỷ luật tạo nên sự khác biệt</p>
+            <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-slate-900 border border-white/10 p-5 rounded-2xl text-center text-3xl mb-4 focus:border-blue-500 outline-none text-white tracking-[0.5em]">
+            <button onclick="checkLogin()" class="btn-main w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl shadow-blue-900/20">BẮT ĐẦU</button>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQees1ob0NzfDK3cvn_mq1t6ksN6IbW1pwqqjFTKlO4duHBJGmLC61YsSBGse36xdY/exec";
+        // CẤU HÌNH JSONBIN
+        const BIN_ID = "69c14b1cc3097a1dd5506616";
+        const MASTER_KEY = "$2a$10$rsdjCcBtsmCWjdnpmLGRfuuT7om1szfnhfvSFBfyP5DPeBH3n/9CK";
+        const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
         const START_DATE = new Date("2026-03-23");
         const DEADLINE = new Date("2026-06-11");
         const TOTAL_DAYS = Math.ceil((DEADLINE - START_DATE) / (1000 * 60 * 60 * 24));
-
+        
         let members = {};
         let currentUser = null;
 
+        // Tải dữ liệu từ JSONBin
         async function loadData() {
-            document.getElementById('loading-bar').style.width = '40%';
+            document.getElementById('loading-bar').style.width = '50%';
             try {
-                const res = await fetch(SCRIPT_URL);
-                members = await res.json();
+                const res = await fetch(`${BASE_URL}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY }
+                });
+                const data = await res.json();
+                members = data.record;
                 renderTable();
-                document.getElementById('sync-status').innerText = "Cloud Synced • Bàn 1";
+                document.getElementById('sync-status').innerText = "CLOUD ONLINE ✅";
                 document.getElementById('loading-bar').style.width = '100%';
                 setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
             } catch (e) {
-                document.getElementById('sync-status').innerText = "Offline Mode ⚠️";
+                document.getElementById('sync-status').innerText = "LỖI KẾT NỐI! ❌";
+                console.error(e);
             }
         }
 
+        // Lưu dữ liệu lên JSONBin
         async function syncToCloud() {
             document.getElementById('loading-bar').style.width = '50%';
             try {
-                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(members) });
-                document.getElementById('sync-status').innerText = "Dữ liệu đã lưu ✅";
+                await fetch(BASE_URL, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": MASTER_KEY
+                    },
+                    body: JSON.stringify(members)
+                });
                 document.getElementById('loading-bar').style.width = '100%';
                 setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
-            } catch (e) { alert("Lỗi lưu mây!"); }
+            } catch (e) { alert("Lỗi đồng bộ mây!"); }
         }
 
         function checkLogin() {
@@ -176,7 +127,7 @@
                 document.getElementById('login-screen').style.display = 'none';
                 updateCountdown();
                 checkTime();
-            } else { alert("Sai mật mã!"); }
+            } else { alert("Mật mã sai! (Thử 1111, 2222...)"); }
         }
 
         function renderTable() {
@@ -186,13 +137,13 @@
                 const m = members[id];
                 let cellsHtml = "";
                 for(let i=1; i<=TOTAL_DAYS; i++) {
-                    let status = m.done.includes(i) ? "cell-done" : "";
+                    let status = (m.done && m.done.includes(i)) ? "cell-done" : "";
                     cellsHtml += `<div class="cell ${status} ml-2">${i}</div>`;
                 }
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="sticky-name">
-                        <div class="text-[14px] font-bold text-slate-100">${m.name}</div>
+                        <div class="text-[14px] font-bold text-white uppercase">${m.name}</div>
                         <div class="text-[11px] text-orange-500 font-black mt-1 ${m.streak > 0 ? 'fire-anim' : 'opacity-20'}">🔥 ${m.streak}</div>
                     </td>
                     <td class="flex py-1">${cellsHtml}</td>
@@ -203,12 +154,17 @@
 
         async function doCheckIn() {
             const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
+            if (dayIndex <= 0) return alert("Chưa đến ngày bắt đầu!");
+            
+            if (!members[currentUser].done) members[currentUser].done = [];
+            
             if (!members[currentUser].done.includes(dayIndex)) {
                 members[currentUser].done.push(dayIndex);
-                members[currentUser].streak += 1;
+                members[currentUser].streak = (members[currentUser].streak || 0) + 1;
                 renderTable();
                 await syncToCloud();
-            }
+                alert(`Day ${dayIndex}: Điểm danh thành công! ✨`);
+            } else { alert("Hôm nay bạn đã xong rồi!"); }
         }
 
         function updateCountdown() {
@@ -220,11 +176,15 @@
 
         function checkTime() {
             const now = new Date();
-            const m = now.getHours() * 60 + now.getMinutes();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const totalM = h * 60 + m;
             const btn = document.getElementById('btn-checkin');
-            const isOn = m >= 240 && m <= 315;
-            btn.disabled = !isOn;
-            btn.innerText = isOn ? "ĐIỂM DANH NGAY 🔥" : "CHƯA ĐẾN GIỜ 🔥";
+            
+            // 4h00 (240m) đến 5h15 (315m)
+            const isOnTime = totalM >= 240 && totalM <= 315;
+            btn.disabled = !isOnTime;
+            btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA ĐẾN GIỜ 🔥";
         }
 
         loadData();
