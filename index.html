@@ -83,58 +83,63 @@
     let members = {};
     let currentUser = null;
 
-    // 1. Tải dữ liệu và KIỂM TRA ĐĂNG NHẬP TỰ ĐỘNG
+    // 1. LOAD DỮ LIỆU THÔNG MINH
     async function loadData() {
-        document.getElementById('loading-bar').style.width = '50%';
+        // Ưu tiên lấy dữ liệu từ bộ nhớ máy trước (Offline first)
+        const localData = localStorage.getItem('cached_members');
+        const savedPass = localStorage.getItem('user_pass');
+
+        if (localData) {
+            members = JSON.parse(localData);
+            renderTable();
+            document.getElementById('sync-status').innerText = "LOCAL CACHE ⚡";
+            if (savedPass && members[savedPass]) {
+                currentUser = savedPass;
+                document.getElementById('login-screen').style.display = 'none';
+            }
+        }
+
+        // Sau đó mới âm thầm cập nhật từ Cloud (Chỉ tốn 1 request)
         try {
             const res = await fetch(`${BASE_URL}/latest`, {
                 headers: { "X-Master-Key": MASTER_KEY }
             });
             const data = await res.json();
             members = data.record;
+            // Cập nhật lại bộ nhớ máy
+            localStorage.setItem('cached_members', JSON.stringify(members));
             renderTable();
-            document.getElementById('sync-status').innerText = "CLOUD ONLINE ✅";
+            document.getElementById('sync-status').innerText = "CLOUD SYNCED ✅";
             
-            // TỰ ĐỘNG ĐĂNG NHẬP NẾU ĐÃ LƯU
-            const savedPass = localStorage.getItem('user_pass');
             if (savedPass && members[savedPass]) {
                 currentUser = savedPass;
                 document.getElementById('login-screen').style.display = 'none';
                 updateCountdown();
                 checkTime();
             }
-
-            document.getElementById('loading-bar').style.width = '100%';
-            setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
         } catch (e) {
-            document.getElementById('sync-status').innerText = "LỖI KẾT NỐI! ❌";
+            console.log("Offline mode - Dùng dữ liệu cũ");
         }
     }
 
-    // 2. Hàm đăng nhập (Có lưu lại mật mã)
     function checkLogin() {
         const pass = document.getElementById('pass-input').value;
         if (members[pass]) {
             currentUser = pass;
-            // LƯU VÀO TRÌNH DUYỆT
             localStorage.setItem('user_pass', pass); 
             document.getElementById('login-screen').style.display = 'none';
             updateCountdown();
             checkTime();
-        } else { 
-            alert("Mật mã sai!"); 
-        }
-    }
-
-    // 3. Hàm đăng xuất (Nếu cần thoát ra nhập mã khác)
-    function logout() {
-        localStorage.removeItem('user_pass');
-        location.reload();
+        } else { alert("Sai mật mã!"); }
     }
 
     async function syncToCloud() {
         document.getElementById('loading-bar').style.width = '50%';
         try {
+            // Lưu vào máy trước cho chắc
+            localStorage.setItem('cached_members', JSON.stringify(members));
+            
+            // Đẩy lên Cloud
             await fetch(BASE_URL, {
                 method: 'PUT',
                 headers: {
@@ -145,7 +150,7 @@
             });
             document.getElementById('loading-bar').style.width = '100%';
             setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
-        } catch (e) { alert("Lỗi đồng bộ!"); }
+        } catch (e) { alert("Lỗi lưu Cloud!"); }
     }
 
     function renderTable() {
@@ -171,10 +176,8 @@
     }
 
     async function doCheckIn() {
-        const now = new Date();
-        const dayIndex = Math.ceil((now - START_DATE) / (1000 * 60 * 60 * 24));
-        if (dayIndex <= 0) return alert("Chưa đến ngày bắt đầu!");
-        
+        const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
+        if (dayIndex <= 0) return alert("Chưa đến ngày!");
         if (!members[currentUser].done) members[currentUser].done = [];
         
         if (!members[currentUser].done.includes(dayIndex)) {
@@ -183,9 +186,7 @@
             renderTable();
             await syncToCloud();
             alert(`Thành công! Streak: ${members[currentUser].streak} 🔥`);
-        } else { 
-            alert("Bạn đã điểm danh hôm nay rồi!"); 
-        }
+        } else { alert("Hôm nay xong rồi!"); }
     }
 
     function updateCountdown() {
@@ -201,8 +202,6 @@
         const m = now.getMinutes();
         const totalM = h * 60 + m;
         const btn = document.getElementById('btn-checkin');
-        
-        // 4h00 đến 5h15
         const isOnTime = totalM >= 240 && totalM <= 315;
         btn.disabled = !isOnTime;
         btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA ĐẾN GIỜ 🔥";
