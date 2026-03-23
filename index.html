@@ -11,43 +11,44 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            color: #1e293b;
+            /* Nền màu Xanh Ghi nhạt, không bị trắng lóa */
+            background: #f1f5f9;
+            color: #0f172a;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Thẻ kính sáng */
+        /* Thẻ có độ tương phản cao hơn */
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
             border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
 
+        /* Khi đã điểm danh - Chuyển sang màu xanh dương nhạt rõ rệt */
         .card-done {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+            background: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
         }
 
         .btn-checkin {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+            background: #2563eb;
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.4);
         }
         
         .btn-checkin:disabled { 
-            background: #cbd5e1; box-shadow: none; color: #64748b;
+            background: #94a3b8; box-shadow: none; color: #f1f5f9;
         }
 
         .responsive-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 20px;
             width: 100%;
         }
 
@@ -59,46 +60,47 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-width: 50px;
         }
     </style>
 </head>
 <body class="p-6">
-    <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-500 transition-all z-50" style="width: 0%"></div>
+    <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-600 transition-all z-50" style="width: 0%"></div>
 
-    <header class="w-full max-w-4xl mb-10 text-center">
-        <h1 class="text-3xl font-black tracking-tighter uppercase mb-6 text-slate-800">
+    <header class="w-full max-w-4xl mb-12 text-center">
+        <h1 class="text-4xl font-black tracking-tighter uppercase mb-8 text-slate-900">
             DẬY HỌC <span class="text-blue-600">ĐÊ!!</span>
         </h1>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            <div class="glass-card p-4 flex flex-col justify-center">
-                <div id="countdown-full" class="flex justify-center gap-3 text-3xl font-black text-blue-600 tracking-tighter italic">
-                    <div class="timer-unit"><span id="days">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Ngày</p></div>
-                    <span>:</span>
-                    <div class="timer-unit"><span id="hours">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Giờ</p></div>
-                    <span>:</span>
-                    <div class="timer-unit"><span id="mins">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Phút</p></div>
-                    <span>:</span>
-                    <div class="timer-unit"><span id="secs">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Giây</p></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div class="glass-card p-6 flex flex-col justify-center border-b-4 border-b-blue-500">
+                <div id="countdown-full" class="flex justify-center gap-2 text-3xl font-extrabold text-slate-800 tracking-tighter">
+                    <div class="timer-unit"><span id="days">00</span><p class="text-[13px] font-bold uppercase text-slate-400">Ngày</p></div>
+                    <span class="pt-1 text-blue-300">:</span>
+                    <div class="timer-unit"><span id="hours">00</span><p class="text-[13px] font-bold uppercase text-slate-400">Giờ</p></div>
+                    <span class="pt-1 text-blue-300">:</span>
+                    <div class="timer-unit"><span id="mins">00</span><p class="text-[13px] font-bold uppercase text-slate-400">Phút</p></div>
+                    <span class="pt-1 text-blue-300">:</span>
+                    <div class="timer-unit"><span id="secs">00</span><p class="text-[13px] font-bold uppercase text-slate-400">Giây</p></div>
                 </div>
             </div>
-            <button id="btn-checkin" onclick="doCheckIn()" class="btn-checkin py-5 rounded-3xl font-black text-xl text-white transition-all active:scale-95">
+            <button id="btn-checkin" onclick="doCheckIn()" class="btn-checkin py-5 rounded-3xl font-black text-2xl text-white transition-all active:scale-95 hover:brightness-110">
                 ĐIỂM DANH 🔥
             </button>
         </div>
     </header>
 
-    <main class="w-full max-w-5xl">
+    <main class="w-full max-w-6xl">
         <div id="member-list" class="responsive-grid"></div>
-        <p id="sync-status" class="text-[9px] text-center font-bold text-slate-400 uppercase tracking-widest mt-8">Đang đồng bộ...</p>
+
     </main>
 
-    <div id="login-screen" class="fixed inset-0 bg-white/80 backdrop-blur-xl z-[200] flex items-center justify-center p-6">
+    <div id="login-screen" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-6">
         <div class="w-full max-w-sm text-center">
-            <h2 class="text-4xl font-black italic uppercase tracking-tighter text-slate-800 mb-8">Dậy Học <span class="text-blue-500">Đê</span></h2>
-            <div class="glass-card p-10 bg-white/50 border-white">
-                <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-transparent border-b-2 border-slate-200 p-4 text-center text-4xl focus:border-blue-500 outline-none text-slate-800 tracking-[0.3em] mb-8 font-bold">
-                <button onclick="checkLogin()" class="btn-checkin w-full py-4 rounded-2xl font-bold text-white uppercase tracking-widest">Bắt đầu</button>
+            <h2 class="text-4xl font-black italic uppercase tracking-tighter text-white mb-8">Dậy Học</h2>
+            <div class="glass-card p-10 bg-white border-white shadow-2xl">
+                <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-transparent border-b-4 border-slate-100 p-4 text-center text-5xl focus:border-blue-500 outline-none text-slate-900 tracking-[0.2em] mb-10 font-black">
+                <button onclick="checkLogin()" class="btn-checkin w-full py-5 rounded-2xl font-extrabold text-white uppercase tracking-widest text-lg">Bắt đầu ngay</button>
             </div>
         </div>
     </div>
@@ -119,10 +121,7 @@
             if (error) throw error;
             membersArr = data;
             renderList();
-            document.getElementById('sync-status').innerText = "Điểm danh từ 4h đến 5h15";
-        } catch (e) {
-            document.getElementById('sync-status').innerText = "Lỗi kết nối ❌";
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderList() {
@@ -142,17 +141,17 @@
             }
 
             const card = document.createElement('div');
-            card.className = `glass-card p-6 flex flex-col items-center justify-center gap-4 ${isActiveToday ? 'card-done' : ''}`;
+            card.className = `glass-card p-8 flex flex-col items-center justify-center gap-6 ${isActiveToday ? 'card-done' : ''}`;
             card.innerHTML = `
-                <div class="text-[12px] font-extrabold uppercase tracking-widest text-slate-500">${m.name}</div>
-                <div class="flex flex-col gap-2 w-full">
-                    <div class="flex items-center justify-between bg-white/40 p-3 rounded-2xl px-5 border border-white/50">
-                        <span class="text-xl">🔥</span>
-                        <span class="text-2xl font-black text-orange-500">${m.streak || 0}</span>
+                <div class="text-[18px] font-black uppercase tracking-widest text-slate-800">${m.name}</div>
+                <div class="flex flex-col gap-3 w-full">
+                    <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
+                        <span class="text-2xl">🔥</span>
+                        <span class="text-3xl font-black text-orange-600">${m.streak || 0}</span>
                     </div>
-                    <div class="flex items-center justify-between bg-white/40 p-3 rounded-2xl px-5 border border-white/50">
-                        <span class="text-xl">❌</span>
-                        <span class="text-2xl font-black text-red-500">${xCount}</span>
+                    <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
+                        <span class="text-2xl">❌</span>
+                        <span class="text-3xl font-black text-red-600">${xCount}</span>
                     </div>
                 </div>
             `;
@@ -161,19 +160,12 @@
     }
 
     function updateCountdown() {
-        const now = new Date();
-        const diff = DEADLINE - now;
-        
-        if (diff <= 0) {
-            document.getElementById('countdown-full').innerHTML = "FINISH! 🏆";
-            return;
-        }
-
+        const diff = DEADLINE - new Date();
+        if (diff <= 0) return;
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
-
         document.getElementById('days').innerText = String(d).padStart(2, '0');
         document.getElementById('hours').innerText = String(h).padStart(2, '0');
         document.getElementById('mins').innerText = String(m).padStart(2, '0');
@@ -196,22 +188,18 @@
         if (!currentUser) return;
         const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
         if (dayIndex <= 0) return alert("Chưa đến ngày bắt đầu!");
-        
-        if (!Array.isArray(currentUser.done)) currentUser.done = [];
-        if (!currentUser.done.includes(dayIndex)) {
-            const { error } = await supabaseClient.from('members').update({ 
-                done: [...currentUser.done, dayIndex], 
-                streak: (currentUser.streak || 0) + 1 
-            }).eq('id', currentUser.id);
-            if (!error) { await loadData(); alert("Điểm danh thành công! Quá cháy 🔥"); }
-        } else { alert("Hôm nay bạn đã xong rồi!"); }
+        const { error } = await supabaseClient.from('members').update({ 
+            done: [...(currentUser.done || []), dayIndex], 
+            streak: (currentUser.streak || 0) + 1 
+        }).eq('id', currentUser.id);
+        if (!error) { await loadData(); alert("Xong! 🔥"); }
     }
 
     function checkTime() {
         const now = new Date();
         const totalM = now.getHours() * 60 + now.getMinutes();
-        const btn = document.getElementById('btn-checkin');
         const isOnTime = totalM >= 240 && totalM <= 315; 
+        const btn = document.getElementById('btn-checkin');
         btn.disabled = !isOnTime;
         btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA TỚI GIỜ";
     }
