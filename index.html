@@ -3,138 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Study Bàn 1 🏆</title>
+    <title>Học Nào :))</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
-        :root {
-            --bg-dark: #020617;
-            --accent: #3b82f6;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #1e293b, #020617);
-            color: #f8fafc; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #1e293b;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
-        /* Glassmorphism Effect */
+        /* Thẻ kính sáng */
         .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .sticky-name { 
-            position: sticky; left: 0; z-index: 50; 
-            background: #0f172a; min-width: 140px; padding: 12px;
-            border-radius: 12px;
-            box-shadow: 10px 0 15px -10px rgba(0,0,0,0.5);
+        .card-done {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
         }
 
-        .cell { 
-            min-width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; 
-            font-family: 'JetBrains Mono', monospace; border-radius: 10px; font-size: 13px;
-            background: var(--glass); border: 1px solid var(--glass-border);
-            color: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .cell-done { 
-            background: linear-gradient(135deg, #10b981, #059669); 
-            color: white !important; border: none;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            transform: scale(1.05);
-        }
-
-        .fire-anim { animation: fire-glow 2s infinite ease-in-out; }
-        @keyframes fire-glow {
-            0%, 100% { filter: drop-shadow(0 0 2px #f97316); transform: translateY(0); }
-            50% { filter: drop-shadow(0 0 10px #f97316); transform: translateY(-2px); }
-        }
-
-        #loading-bar { 
-            position: fixed; top: 0; left: 0; height: 3px; 
-            background: linear-gradient(to right, #3b82f6, #60a5fa); 
-            width: 0%; z-index: 1000; transition: width 0.3s; 
-        }
-
-        .scroll-container::-webkit-scrollbar { height: 6px; }
-        .scroll-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-        
         .btn-checkin {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
         }
-        .btn-checkin:disabled { background: #1e293b; opacity: 0.6; box-shadow: none; }
+        
+        .btn-checkin:disabled { 
+            background: #cbd5e1; box-shadow: none; color: #64748b;
+        }
+
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .responsive-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .timer-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div id="loading-bar"></div>
+<body class="p-6">
+    <div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-500 transition-all z-50" style="width: 0%"></div>
 
-    <header class="max-w-6xl mx-auto w-full mb-8">
-        <div class="flex flex-col md:flex-row gap-6 items-stretch md:items-center justify-between">
-            <div class="space-y-2">
-                <h1 class="text-3xl font-extrabold tracking-tight italic">
-                    ELITE <span class="text-blue-500">STUDY</span> <span class="text-slate-500 text-lg ml-1">Bàn 1</span>
-                </h1>
-                <div class="flex items-center gap-2">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <p id="sync-status" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Kết nối hệ thống...</p>
+    <header class="w-full max-w-4xl mb-10 text-center">
+        <h1 class="text-3xl font-black tracking-tighter uppercase mb-6 text-slate-800">
+            DẬY HỌC <span class="text-blue-600">ĐÊ!!</span>
+        </h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <div class="glass-card p-4 flex flex-col justify-center">
+                <div id="countdown-full" class="flex justify-center gap-3 text-3xl font-black text-blue-600 tracking-tighter italic">
+                    <div class="timer-unit"><span id="days">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Ngày</p></div>
+                    <span>:</span>
+                    <div class="timer-unit"><span id="hours">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Giờ</p></div>
+                    <span>:</span>
+                    <div class="timer-unit"><span id="mins">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Phút</p></div>
+                    <span>:</span>
+                    <div class="timer-unit"><span id="secs">--</span><p class="text-[8px] uppercase tracking-widest text-slate-400">Giây</p></div>
                 </div>
             </div>
-
-            <div class="flex gap-4">
-                <div class="glass-card px-6 py-3 flex flex-col items-center justify-center min-w-[120px]">
-                    <span id="countdown-num" class="text-3xl font-black text-blue-400 leading-none">--</span>
-                    <span class="text-[9px] uppercase font-bold tracking-tighter text-slate-500 mt-1">Ngày tới mục tiêu</span>
-                </div>
-                <button id="btn-checkin" onclick="doCheckIn()" class="btn-checkin flex-1 md:flex-none px-10 py-4 rounded-2xl font-bold text-lg tracking-wider text-white transition-all active:scale-95 disabled:cursor-not-allowed">
-                    ĐIỂM DANH 🔥
-                </button>
-            </div>
+            <button id="btn-checkin" onclick="doCheckIn()" class="btn-checkin py-5 rounded-3xl font-black text-xl text-white transition-all active:scale-95">
+                ĐIỂM DANH 🔥
+            </button>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
-        <div class="flex justify-between items-center mb-4 px-2">
-            <h3 class="font-bold text-slate-400 text-sm uppercase tracking-widest">Bảng vinh danh</h3>
-            <div class="flex gap-2">
-                <button onclick="scrollTable(-200)" class="w-10 h-10 glass-card flex items-center justify-center hover:bg-white/5">‹</button>
-                <button onclick="scrollTable(200)" class="w-10 h-10 glass-card flex items-center justify-center hover:bg-white/5">›</button>
-            </div>
-        </div>
-
-        <div class="glass-card flex-1 overflow-hidden flex flex-col p-2">
-            <div class="overflow-x-auto scroll-container h-full p-2" id="table-container" style="scroll-behavior: smooth;">
-                <table class="w-full border-separate border-spacing-y-3">
-                    <tbody id="main-table-body"></tbody>
-                </table>
-            </div>
-        </div>
+    <main class="w-full max-w-5xl">
+        <div id="member-list" class="responsive-grid"></div>
+        <p id="sync-status" class="text-[9px] text-center font-bold text-slate-400 uppercase tracking-widest mt-8">Đang đồng bộ...</p>
     </main>
 
-    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-[200] flex items-center justify-center p-6">
-        <div class="w-full max-w-md space-y-8 text-center">
-            <div class="space-y-2">
-                <h2 class="text-5xl font-black italic tracking-tighter uppercase">Elite <span class="text-blue-500">Club</span></h2>
-                <p class="text-slate-500 text-xs tracking-[0.5em] uppercase">Kỷ luật tạo nên sự khác biệt</p>
-            </div>
-            
-            <div class="glass-card p-8 space-y-4">
-                <input type="password" id="pass-input" placeholder="••••" class="w-full bg-slate-900/50 border border-white/10 p-5 rounded-2xl text-center text-4xl focus:border-blue-500 outline-none text-white tracking-[0.3em] transition-all">
-                <button onclick="checkLogin()" class="btn-checkin w-full py-5 rounded-2xl font-black text-lg text-white">XÁC NHẬN</button>
-                <p class="text-slate-600 text-[10px] uppercase">Vui lòng nhập mật mã cá nhân để tiếp tục</p>
+    <div id="login-screen" class="fixed inset-0 bg-white/80 backdrop-blur-xl z-[200] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm text-center">
+            <h2 class="text-4xl font-black italic uppercase tracking-tighter text-slate-800 mb-8">Dậy Học <span class="text-blue-500">Đê</span></h2>
+            <div class="glass-card p-10 bg-white/50 border-white">
+                <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-transparent border-b-2 border-slate-200 p-4 text-center text-4xl focus:border-blue-500 outline-none text-slate-800 tracking-[0.3em] mb-8 font-bold">
+                <button onclick="checkLogin()" class="btn-checkin w-full py-4 rounded-2xl font-bold text-white uppercase tracking-widest">Bắt đầu</button>
             </div>
         </div>
     </div>
@@ -142,122 +106,117 @@
 <script>
     const SUPABASE_URL = 'https://bbidkpycatwtnbgeasyw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJiaWRrcHljYXR3dG5iZ2Vhc3l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjgwNDUsImV4cCI6MjA4OTg0NDA0NX0.nzRA3Me2fIch57uXzcAq5hbF9navhGw97-ykQBvdrDw';
-    
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const START_DATE = new Date("2026-03-23");
-    const DEADLINE = new Date("2026-06-11");
-    const TOTAL_DAYS = Math.ceil((DEADLINE - START_DATE) / (1000 * 60 * 60 * 24));
-    
+    const START_DATE = new Date("2026-03-24T00:00:00");
+    const DEADLINE = new Date("2026-06-10T23:59:59");
     let membersArr = []; 
     let currentUser = null;
 
     async function loadData() {
-        showLoading(50);
         try {
-            const { data, error } = await supabaseClient
-                .from('members')
-                .select('*')
-                .order('streak', { ascending: false });
-
+            const { data, error } = await supabaseClient.from('members').select('*').limit(4);
             if (error) throw error;
             membersArr = data;
-            renderTable();
-            document.getElementById('sync-status').innerText = "Hệ thống Online ✅";
-            showLoading(100);
-            setTimeout(() => showLoading(0), 500);
+            renderList();
+            document.getElementById('sync-status').innerText = "Điểm danh từ 4h đến 5h15";
         } catch (e) {
-            document.getElementById('sync-status').innerText = "Lỗi đồng bộ! ❌";
-            console.error(e.message);
+            document.getElementById('sync-status').innerText = "Lỗi kết nối ❌";
         }
+    }
+
+    function renderList() {
+        const list = document.getElementById('member-list');
+        list.innerHTML = "";
+        const now = new Date();
+        const diffTime = now - START_DATE;
+        const totalDaysPassed = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+        const currentDayIndex = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        membersArr.forEach((m) => {
+            const doneArr = Array.isArray(m.done) ? m.done : [];
+            const isActiveToday = doneArr.includes(currentDayIndex);
+            let xCount = 0;
+            for (let i = 1; i <= totalDaysPassed; i++) {
+                if (!doneArr.includes(i)) xCount++;
+            }
+
+            const card = document.createElement('div');
+            card.className = `glass-card p-6 flex flex-col items-center justify-center gap-4 ${isActiveToday ? 'card-done' : ''}`;
+            card.innerHTML = `
+                <div class="text-[12px] font-extrabold uppercase tracking-widest text-slate-500">${m.name}</div>
+                <div class="flex flex-col gap-2 w-full">
+                    <div class="flex items-center justify-between bg-white/40 p-3 rounded-2xl px-5 border border-white/50">
+                        <span class="text-xl">🔥</span>
+                        <span class="text-2xl font-black text-orange-500">${m.streak || 0}</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-white/40 p-3 rounded-2xl px-5 border border-white/50">
+                        <span class="text-xl">❌</span>
+                        <span class="text-2xl font-black text-red-500">${xCount}</span>
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function updateCountdown() {
+        const now = new Date();
+        const diff = DEADLINE - now;
+        
+        if (diff <= 0) {
+            document.getElementById('countdown-full').innerHTML = "FINISH! 🏆";
+            return;
+        }
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = String(d).padStart(2, '0');
+        document.getElementById('hours').innerText = String(h).padStart(2, '0');
+        document.getElementById('mins').innerText = String(m).padStart(2, '0');
+        document.getElementById('secs').innerText = String(s).padStart(2, '0');
     }
 
     function checkLogin() {
-        const pass = document.getElementById('pass-input').value.trim();
-        if (membersArr.length === 0) return;
-
+        const pass = document.getElementById('pass-input')?.value.trim();
         const user = membersArr.find(m => String(m.id) === pass);
         if (user) {
             currentUser = user;
-            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('login-screen').style.display = 'none';
+            setInterval(updateCountdown, 1000);
             updateCountdown();
             checkTime();
-        } else { 
-            alert("Mật mã chưa chính xác!"); 
-        }
-    }
-
-    function renderTable() {
-        const body = document.getElementById('main-table-body');
-        body.innerHTML = "";
-        
-        membersArr.forEach(m => {
-            let cellsHtml = "";
-            for(let i = 1; i <= TOTAL_DAYS; i++) {
-                const isDone = Array.isArray(m.done) && m.done.includes(i);
-                cellsHtml += `<div class="cell ${isDone ? 'cell-done' : ''} ml-2">${i}</div>`;
-            }
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="sticky-name">
-                    <div class="text-[13px] font-bold text-white uppercase tracking-tight">${m.name}</div>
-                    <div class="text-[11px] text-orange-500 font-black flex items-center gap-1 mt-0.5 ${m.streak > 0 ? 'fire-anim' : 'opacity-20'}">
-                        <span>🔥</span> ${m.streak} ngày
-                    </div>
-                </td>
-                <td class="flex items-center py-2">${cellsHtml}</td>
-            `;
-            body.appendChild(row);
-        });
+        } else { alert("Mật mã sai!"); }
     }
 
     async function doCheckIn() {
         if (!currentUser) return;
         const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
-        if (dayIndex <= 0) return alert("Thử thách chưa bắt đầu!");
-
+        if (dayIndex <= 0) return alert("Chưa đến ngày bắt đầu!");
+        
         if (!Array.isArray(currentUser.done)) currentUser.done = [];
         if (!currentUser.done.includes(dayIndex)) {
-            showLoading(50);
-            const { error } = await supabaseClient
-                .from('members')
-                .update({ done: [...currentUser.done, dayIndex], streak: (currentUser.streak || 0) + 1 })
-                .eq('id', currentUser.id);
-
-            if (!error) {
-                await loadData();
-                alert(`Tuyệt vời! Day ${dayIndex} hoàn tất. 🌟`);
-            }
-            showLoading(100);
-            setTimeout(() => showLoading(0), 500);
-        } else { 
-            alert("Bạn đã điểm danh hôm nay rồi!"); 
-        }
+            const { error } = await supabaseClient.from('members').update({ 
+                done: [...currentUser.done, dayIndex], 
+                streak: (currentUser.streak || 0) + 1 
+            }).eq('id', currentUser.id);
+            if (!error) { await loadData(); alert("Điểm danh thành công! Quá cháy 🔥"); }
+        } else { alert("Hôm nay bạn đã xong rồi!"); }
     }
-
-    function showLoading(pct) { document.getElementById('loading-bar').style.width = pct + '%'; }
-    
-    function updateCountdown() {
-        const diff = DEADLINE - new Date();
-        document.getElementById('countdown-num').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-    }
-
-    function scrollTable(amt) { document.getElementById('table-container').scrollLeft += amt; }
 
     function checkTime() {
         const now = new Date();
         const totalM = now.getHours() * 60 + now.getMinutes();
         const btn = document.getElementById('btn-checkin');
-        const isOnTime = totalM >= 240 && totalM <= 315; // 4:00 - 5:15
+        const isOnTime = totalM >= 240 && totalM <= 315; 
         btn.disabled = !isOnTime;
-        btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA TỚI GIỜ 🔥";
+        btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA TỚI GIỜ";
     }
 
-    window.onload = () => {
-        loadData();
-        setInterval(checkTime, 30000);
-    };
+    window.onload = () => { loadData(); setInterval(checkTime, 15000); };
 </script>
 </body>
 </html>
