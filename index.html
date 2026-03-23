@@ -3,151 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bàn 1: Study Dashboard 📘</title>
+    <title>Bàn 1: Elite Study 🏆</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=JetBrains+Mono:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@500&display=swap');
         
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #3b82f6;
+            --success: #22c55e;
+        }
+
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc; /* Màu trắng ghi sang trọng */
-            color: #1e293b; 
-            overflow: hidden; 
+            background-color: var(--bg); 
+            color: #f8fafc;
+            overflow: hidden;
         }
-        
-        /* Cột tên cố định - Đã xử lý che hoàn toàn chữ lọt qua */
+
+        /* Thanh trạng thái Cloud gọn gàng */
+        #sync-status {
+            font-size: 9px;
+            letter-spacing: 0.15em;
+            color: #94a3b8;
+        }
+
+        /* Cột tên cố định - Hiệu ứng Glassmorphism */
         .sticky-name { 
-            position: sticky; left: 0; z-index: 50; 
-            background: white;
-            min-width: 140px; 
-            padding: 12px 15px;
-            border-right: 2px solid #3b82f6; /* Viền xanh dương làm điểm nhấn */
-            box-shadow: 10px 0 15px -10px rgba(0,0,0,0.05);
+            position: sticky; left: 0; z-index: 100; 
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(8px);
+            min-width: 120px; 
+            padding: 15px;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Ô số ngày kiểu Card nhẹ */
+        /* Ô số ngày - Tinh tế hơn */
         .cell { 
-            min-width: 50px; height: 50px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            min-width: 44px; height: 44px; 
+            display: flex; align-items: center; justify-content: center; 
             font-family: 'JetBrains Mono', monospace; 
-            border-radius: 14px;
-            font-size: 13px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
+            border-radius: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2);
             flex-shrink: 0;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: 0.3s all;
         }
         
-        .cell:hover { transform: translateY(-2px); border-color: #3b82f6; }
-        .cell-done { background: #22c55e !material; color: #fff; border-color: #16a34a; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
-        .cell-miss { background: #ef4444; color: #fff; border-color: #dc2626; }
+        .cell-done { 
+            background: linear-gradient(135deg, #22c55e, #16a34a); 
+            color: white !important; 
+            border: none;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        }
 
-        .scroll-container { overflow-x: auto; scroll-behavior: smooth; padding-bottom: 10px; }
+        .cell-miss { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: #ef4444; 
+            border: 1px solid rgba(239, 68, 68, 0.2); 
+        }
+
+        .scroll-container { overflow-x: auto; scroll-behavior: smooth; }
         .scroll-container::-webkit-scrollbar { display: none; }
         
-        .fire-anim { animation: fire-bounce 0.8s infinite alternate; display: inline-block; filter: drop-shadow(0 0 4px #fb923c); }
-        @keyframes fire-bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
+        /* Hiệu ứng lửa chiến thần */
+        .fire-anim { 
+            animation: glow-fire 1.5s infinite alternate;
+        }
+        @keyframes glow-fire {
+            from { filter: drop-shadow(0 0 2px #f97316); transform: scale(1); }
+            to { filter: drop-shadow(0 0 8px #f97316); transform: scale(1.1); }
+        }
 
-        header { background: white; border-bottom: 1px solid #e2e8f0; }
-        .nav-btn { background: white; border: 1px solid #e2e8f0; transition: all 0.2s; }
-        .nav-btn:active { transform: scale(0.9); background: #f1f5f9; }
+        .btn-main {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transition: 0.3s;
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+        }
+        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-main:disabled { background: #334155; box-shadow: none; color: #64748b; }
 
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: #3b82f6; z-index: 200; display: none; }
+        #loading-bar { position: fixed; top: 0; left: 0; height: 2px; background: #3b82f6; width: 0%; z-index: 999; transition: 0.3s; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
-    <div id="loading"></div>
+    <div id="loading-bar"></div>
 
-    <header class="p-4 flex items-center justify-between gap-4 shadow-sm">
-        <button id="btn-checkin" onclick="doCheckIn()" class="flex-[1.5] py-4 bg-blue-700 hover:bg-blue-800 text-white rounded-2xl font-extrabold text-lg shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:bg-slate-300">
-            ĐIỂM DANH 🔥
-        </button>
-
-        <div class="flex-1 bg-blue-50/50 border border-blue-100 rounded-2xl px-4 py-2 text-right">
-            <span id="countdown-num" class="text-3xl font-black text-blue-800 leading-none">--</span>
-            <div class="text-[8px] uppercase font-bold text-blue-400 tracking-widest">Ngày tới 11/06</div>
+    <header class="p-6 flex flex-col gap-4">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tighter italic">BÀN 1 <span class="text-blue-500">STUDY</span></h1>
+                <p id="sync-status" class="uppercase mt-1">SỬ DỤNG DỮ LIỆU ĐÁM MÂY</p>
+            </div>
+            <div class="bg-slate-800/50 border border-white/5 rounded-2xl p-3 text-center min-w-[80px]">
+                <div id="countdown-num" class="text-2xl font-black text-blue-400">--</div>
+                <div class="text-[7px] uppercase font-bold text-slate-500">Ngày tới 11/06</div>
+            </div>
         </div>
+
+        <button id="btn-checkin" onclick="doCheckIn()" class="btn-main w-full py-4 rounded-2xl font-bold text-lg tracking-widest disabled:opacity-50">
+            ĐIỂM DANH NGAY 🔥
+        </button>
     </header>
 
-    <div class="flex justify-between px-6 py-4 items-center bg-slate-50/50">
-        <button onclick="scrollTable(-200)" class="nav-btn w-10 h-10 rounded-xl flex items-center justify-center font-bold text-slate-400"> < </button>
-        <div id="sync-status" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-[0.2em] bg-white px-3 py-1 rounded-full border border-slate-100">Đang đồng bộ...</div>
-        <button onclick="scrollTable(200)" class="nav-btn w-10 h-10 rounded-xl flex items-center justify-center font-bold text-slate-400"> > </button>
+    <div class="flex justify-between px-6 mb-2">
+        <button onclick="scrollTable(-150)" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-xl"> ‹ </button>
+        <button onclick="scrollTable(150)" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-xl"> › </button>
     </div>
 
-    <main class="flex-1 overflow-hidden relative">
-        <div class="h-full scroll-container p-4" id="table-container">
+    <main class="flex-1 overflow-hidden">
+        <div class="h-full scroll-container px-4" id="table-container">
             <table class="w-full border-separate border-spacing-y-4">
                 <tbody id="main-table-body"></tbody>
             </table>
         </div>
     </main>
 
-    <div id="login-screen" class="fixed inset-0 bg-slate-50/90 backdrop-blur-md flex items-center justify-center z-[100] p-6">
-        <div class="w-full max-w-sm text-center bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-blue-200">
-                <span class="text-2xl">📘</span>
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-[200] flex items-center justify-center p-8">
+        <div class="w-full max-w-sm">
+            <div class="mb-10 text-center">
+                <div class="inline-block p-4 bg-blue-600/10 rounded-3xl mb-4 border border-blue-500/20">
+                    <span class="text-4xl">⚡</span>
+                </div>
+                <h2 class="text-3xl font-black italic">ELITE <span class="text-blue-500">CLUB</span></h2>
+                <p class="text-slate-500 text-[10px] tracking-[0.4em] uppercase mt-2">Đăng nhập để tiếp tục</p>
             </div>
-            <h1 class="text-3xl font-black mb-1 text-slate-900 uppercase tracking-tight">Bàn 1 <span class="text-blue-600">Study</span></h1>
-            <p class="text-slate-400 text-[10px] font-bold tracking-[0.3em] mb-8 uppercase">Kỷ luật là sức mạnh</p>
-            <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl text-center text-2xl focus:outline-none focus:border-blue-600 mb-4 transition-all">
-            <button onclick="checkLogin()" class="w-full py-4 bg-blue-700 text-white rounded-2xl font-black text-lg hover:bg-blue-800 transition-all shadow-xl shadow-blue-100">BẮT ĐẦU</button>
+            <input type="password" id="pass-input" placeholder="••••" class="w-full bg-slate-900 border border-white/10 p-5 rounded-2xl text-center text-3xl mb-4 focus:border-blue-500 outline-none transition-all">
+            <button onclick="checkLogin()" class="btn-main w-full py-5 rounded-2xl font-black text-lg">XÁC NHẬN</button>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQees1ob0NzfDK3cvn_mq1t6ksN6IbW1pwqqjFTKlO4duHBJGmLC61YsSBGse36xdY/exec";
-        const DEADLINE = new Date("2026-06-11");
         const START_DATE = new Date("2026-03-23");
+        const DEADLINE = new Date("2026-06-11");
         const TOTAL_DAYS = Math.ceil((DEADLINE - START_DATE) / (1000 * 60 * 60 * 24));
 
         let members = {};
         let currentUser = null;
 
         async function loadData() {
-            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loading-bar').style.width = '40%';
             try {
-                const response = await fetch(SCRIPT_URL);
-                members = await response.json();
+                const res = await fetch(SCRIPT_URL);
+                members = await res.json();
                 renderTable();
-                document.getElementById('sync-status').innerText = "Cloud Synced ✅";
+                document.getElementById('sync-status').innerText = "Cloud Synced • Bàn 1";
+                document.getElementById('loading-bar').style.width = '100%';
+                setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
             } catch (e) {
-                members = JSON.parse(localStorage.getItem('study_data')) || {
-                    "1111": { name: "Hùng", done: [], missed: [], streak: 0 },
-                    "2222": { name: "Hường", done: [], missed: [], streak: 0 },
-                    "3333": { name: "Nhi", done: [], missed: [], streak: 0 },
-                    "4444": { name: "Vượng", done: [], missed: [], streak: 0 }
-                };
-                renderTable();
-                document.getElementById('sync-status').innerText = "Local Mode ⚠️";
+                document.getElementById('sync-status').innerText = "Offline Mode ⚠️";
             }
-            document.getElementById('loading').style.display = 'none';
         }
 
         async function syncToCloud() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('sync-status').innerText = "Syncing...";
+            document.getElementById('loading-bar').style.width = '50%';
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(members) });
-                document.getElementById('sync-status').innerText = "Cloud Synced ✅";
-            } catch (e) { alert("Lỗi lưu trữ mây!"); }
-            document.getElementById('loading').style.display = 'none';
+                document.getElementById('sync-status').innerText = "Dữ liệu đã lưu ✅";
+                document.getElementById('loading-bar').style.width = '100%';
+                setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
+            } catch (e) { alert("Lỗi lưu mây!"); }
         }
 
         function checkLogin() {
             const pass = document.getElementById('pass-input').value;
             if (members[pass]) {
                 currentUser = pass;
-                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('login-screen').style.display = 'none';
                 updateCountdown();
                 checkTime();
-            } else { alert("Mật mã không đúng!"); }
-        }
-
-        function updateCountdown() {
-            const diff = DEADLINE - new Date();
-            document.getElementById('countdown-num').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+            } else { alert("Sai mật mã!"); }
         }
 
         function renderTable() {
@@ -157,18 +186,16 @@
                 const m = members[id];
                 let cellsHtml = "";
                 for(let i=1; i<=TOTAL_DAYS; i++) {
-                    let status = m.done.includes(i) ? "cell-done" : (m.missed.includes(i) ? "cell-miss" : "");
-                    cellsHtml += `<div class="cell ${status} ml-3"><span class="text-[8px] opacity-30 font-bold uppercase">D</span>${i}</div>`;
+                    let status = m.done.includes(i) ? "cell-done" : "";
+                    cellsHtml += `<div class="cell ${status} ml-2">${i}</div>`;
                 }
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="sticky-name">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[15px] font-extrabold text-slate-800 uppercase tracking-tight">${m.name}</span>
-                            <span class="text-orange-500 font-bold ${m.streak > 0 ? 'fire-anim' : 'opacity-10'}">🔥${m.streak}</span>
-                        </div>
+                        <div class="text-[14px] font-bold text-slate-100">${m.name}</div>
+                        <div class="text-[11px] text-orange-500 font-black mt-1 ${m.streak > 0 ? 'fire-anim' : 'opacity-20'}">🔥 ${m.streak}</div>
                     </td>
-                    <td class="flex py-1 px-2">${cellsHtml}</td>
+                    <td class="flex py-1">${cellsHtml}</td>
                 `;
                 body.appendChild(row);
             });
@@ -176,25 +203,28 @@
 
         async function doCheckIn() {
             const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
-            if (dayIndex <= 0 || dayIndex > TOTAL_DAYS) return alert("Không trong thời gian dự án!");
             if (!members[currentUser].done.includes(dayIndex)) {
                 members[currentUser].done.push(dayIndex);
                 members[currentUser].streak += 1;
                 renderTable();
                 await syncToCloud();
-                alert(`Chúc mừng! Bạn đã hoàn thành Day ${dayIndex} 🔥`);
-            } else { alert("Bạn đã điểm danh rồi!"); }
+            }
         }
 
-        function scrollTable(amount) { document.getElementById('table-container').scrollLeft += amount; }
-        
+        function updateCountdown() {
+            const diff = DEADLINE - new Date();
+            document.getElementById('countdown-num').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+        }
+
+        function scrollTable(amt) { document.getElementById('table-container').scrollLeft += amt; }
+
         function checkTime() {
             const now = new Date();
-            const totalM = now.getHours() * 60 + now.getMinutes();
+            const m = now.getHours() * 60 + now.getMinutes();
             const btn = document.getElementById('btn-checkin');
-            const isOnTime = totalM >= 240 && totalM <= 315;
-            btn.disabled = !isOnTime;
-            btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "HẾT GIỜ 🔥";
+            const isOn = m >= 240 && m <= 315;
+            btn.disabled = !isOn;
+            btn.innerText = isOn ? "ĐIỂM DANH NGAY 🔥" : "CHƯA ĐẾN GIỜ 🔥";
         }
 
         loadData();
