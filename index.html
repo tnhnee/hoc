@@ -5,190 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Study Bàn 1 🏆</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@500&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap');
+        
+        :root {
+            --bg-dark: #020617;
+            --accent: #3b82f6;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top right, #1e293b, #020617);
+            color: #f8fafc; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+
         .sticky-name { 
-            position: sticky; left: 0; z-index: 100; 
-            background: #020617; min-width: 120px; padding: 15px;
-            border-right: 2px solid #3b82f6;
+            position: sticky; left: 0; z-index: 50; 
+            background: #0f172a; min-width: 140px; padding: 12px;
+            border-radius: 12px;
+            box-shadow: 10px 0 15px -10px rgba(0,0,0,0.5);
         }
+
         .cell { 
-            min-width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
-            font-family: 'JetBrains Mono', monospace; border-radius: 12px; font-size: 14px;
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.2); flex-shrink: 0; transition: 0.3s;
+            min-width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; 
+            font-family: 'JetBrains Mono', monospace; border-radius: 10px; font-size: 13px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            color: rgba(255, 255, 255, 0.3); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .cell-done { 
-            background: linear-gradient(135deg, #22c55e, #16a34a); color: white !important; 
-            border: none; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white !important; border: none;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
         }
-        .scroll-container::-webkit-scrollbar { display: none; }
-        .fire-anim { animation: glow-fire 1.5s infinite alternate; }
-        @keyframes glow-fire { from { filter: drop-shadow(0 0 2px #f97316); transform: scale(1); } to { filter: drop-shadow(0 0 8px #f97316); transform: scale(1.1); } }
-        .btn-main { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .btn-main:disabled { background: #1e293b; color: #64748b; opacity: 0.5; cursor: not-allowed; }
-        #loading-bar { position: fixed; top: 0; left: 0; height: 3px; background: #3b82f6; width: 0%; z-index: 999; transition: 0.3s; }
+
+        .fire-anim { animation: fire-glow 2s infinite ease-in-out; }
+        @keyframes fire-glow {
+            0%, 100% { filter: drop-shadow(0 0 2px #f97316); transform: translateY(0); }
+            50% { filter: drop-shadow(0 0 10px #f97316); transform: translateY(-2px); }
+        }
+
+        #loading-bar { 
+            position: fixed; top: 0; left: 0; height: 3px; 
+            background: linear-gradient(to right, #3b82f6, #60a5fa); 
+            width: 0%; z-index: 1000; transition: width 0.3s; 
+        }
+
+        .scroll-container::-webkit-scrollbar { height: 6px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        
+        .btn-checkin {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+        .btn-checkin:disabled { background: #1e293b; opacity: 0.6; box-shadow: none; }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="p-4 md:p-8">
     <div id="loading-bar"></div>
-    <header class="p-6 flex flex-col gap-4">
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tighter italic">BÀN 1 <span class="text-blue-500">STUDY</span></h1>
-                <p id="sync-status" class="text-[9px] uppercase mt-1 tracking-widest text-slate-500 italic font-bold">Connecting JSONBin...</p>
+
+    <header class="max-w-6xl mx-auto w-full mb-8">
+        <div class="flex flex-col md:flex-row gap-6 items-stretch md:items-center justify-between">
+            <div class="space-y-2">
+                <h1 class="text-3xl font-extrabold tracking-tight italic">
+                    ELITE <span class="text-blue-500">STUDY</span> <span class="text-slate-500 text-lg ml-1">Bàn 1</span>
+                </h1>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <p id="sync-status" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Kết nối hệ thống...</p>
+                </div>
             </div>
-            <div class="bg-slate-900 border border-white/5 rounded-2xl p-3 text-center">
-                <div id="countdown-num" class="text-2xl font-black text-blue-400">--</div>
-                <div class="text-[7px] uppercase font-bold text-slate-600">Ngày tới 11/06</div>
+
+            <div class="flex gap-4">
+                <div class="glass-card px-6 py-3 flex flex-col items-center justify-center min-w-[120px]">
+                    <span id="countdown-num" class="text-3xl font-black text-blue-400 leading-none">--</span>
+                    <span class="text-[9px] uppercase font-bold tracking-tighter text-slate-500 mt-1">Ngày tới mục tiêu</span>
+                </div>
+                <button id="btn-checkin" onclick="doCheckIn()" class="btn-checkin flex-1 md:flex-none px-10 py-4 rounded-2xl font-bold text-lg tracking-wider text-white transition-all active:scale-95 disabled:cursor-not-allowed">
+                    ĐIỂM DANH 🔥
+                </button>
             </div>
         </div>
-        <button id="btn-checkin" onclick="doCheckIn()" class="btn-main w-full py-4 rounded-2xl font-bold text-lg tracking-widest transition-all active:scale-95 text-white">
-            ĐIỂM DANH 🔥
-        </button>
     </header>
 
-    <div class="flex justify-between px-6 mb-2">
-        <button onclick="scrollTable(-150)" class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-xl shadow-lg border border-white/5"> ‹ </button>
-        <button onclick="scrollTable(150)" class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-xl shadow-lg border border-white/5"> › </button>
-    </div>
+    <main class="max-w-6xl mx-auto w-full flex-1 flex flex-col min-h-0">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <h3 class="font-bold text-slate-400 text-sm uppercase tracking-widest">Bảng vinh danh</h3>
+            <div class="flex gap-2">
+                <button onclick="scrollTable(-200)" class="w-10 h-10 glass-card flex items-center justify-center hover:bg-white/5">‹</button>
+                <button onclick="scrollTable(200)" class="w-10 h-10 glass-card flex items-center justify-center hover:bg-white/5">›</button>
+            </div>
+        </div>
 
-    <main class="flex-1 overflow-hidden">
-        <div class="h-full overflow-x-auto px-4" id="table-container" style="scroll-behavior: smooth;">
-            <table class="w-full border-separate border-spacing-y-4">
-                <tbody id="main-table-body"></tbody>
-            </table>
+        <div class="glass-card flex-1 overflow-hidden flex flex-col p-2">
+            <div class="overflow-x-auto scroll-container h-full p-2" id="table-container" style="scroll-behavior: smooth;">
+                <table class="w-full border-separate border-spacing-y-3">
+                    <tbody id="main-table-body"></tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <div id="login-screen" class="fixed inset-0 bg-[#020617] z-[200] flex items-center justify-center p-8">
-        <div class="w-full max-w-sm text-center">
-            <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tighter">Elite <span class="text-blue-500">Club</span></h2>
-            <p class="text-slate-500 text-[10px] tracking-[0.4em] uppercase mb-8">Kỷ luật tạo nên sự khác biệt</p>
-            <input type="password" id="pass-input" placeholder="MẬT MÃ" class="w-full bg-slate-900 border border-white/10 p-5 rounded-2xl text-center text-3xl mb-4 focus:border-blue-500 outline-none text-white tracking-[0.5em]">
-            <button onclick="checkLogin()" class="btn-main w-full py-5 rounded-2xl font-black text-lg text-white shadow-xl shadow-blue-900/20">BẮT ĐẦU</button>
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 z-[200] flex items-center justify-center p-6">
+        <div class="w-full max-w-md space-y-8 text-center">
+            <div class="space-y-2">
+                <h2 class="text-5xl font-black italic tracking-tighter uppercase">Elite <span class="text-blue-500">Club</span></h2>
+                <p class="text-slate-500 text-xs tracking-[0.5em] uppercase">Kỷ luật tạo nên sự khác biệt</p>
+            </div>
+            
+            <div class="glass-card p-8 space-y-4">
+                <input type="password" id="pass-input" placeholder="••••" class="w-full bg-slate-900/50 border border-white/10 p-5 rounded-2xl text-center text-4xl focus:border-blue-500 outline-none text-white tracking-[0.3em] transition-all">
+                <button onclick="checkLogin()" class="btn-checkin w-full py-5 rounded-2xl font-black text-lg text-white">XÁC NHẬN</button>
+                <p class="text-slate-600 text-[10px] uppercase">Vui lòng nhập mật mã cá nhân để tiếp tục</p>
+            </div>
         </div>
     </div>
 
 <script>
-    const BIN_ID = "69c14b1cc3097a1dd5506616";
-    const MASTER_KEY = "$2a$10$rsdjCcBtsmCWjdnpmLGRfuuT7om1szfnhfvSFBfyP5DPeBH3n/9CK";
-    const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+    const SUPABASE_URL = 'https://bbidkpycatwtnbgeasyw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJiaWRrcHljYXR3dG5iZ2Vhc3l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNjgwNDUsImV4cCI6MjA4OTg0NDA0NX0.nzRA3Me2fIch57uXzcAq5hbF9navhGw97-ykQBvdrDw';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const START_DATE = new Date("2026-03-23");
     const DEADLINE = new Date("2026-06-11");
     const TOTAL_DAYS = Math.ceil((DEADLINE - START_DATE) / (1000 * 60 * 60 * 24));
     
-    let members = {};
+    let membersArr = []; 
     let currentUser = null;
 
-    // 1. LOAD DỮ LIỆU THÔNG MINH
     async function loadData() {
-        // Ưu tiên lấy dữ liệu từ bộ nhớ máy trước (Offline first)
-        const localData = localStorage.getItem('cached_members');
-        const savedPass = localStorage.getItem('user_pass');
-
-        if (localData) {
-            members = JSON.parse(localData);
-            renderTable();
-            document.getElementById('sync-status').innerText = "LOCAL CACHE ⚡";
-            if (savedPass && members[savedPass]) {
-                currentUser = savedPass;
-                document.getElementById('login-screen').style.display = 'none';
-            }
-        }
-
-        // Sau đó mới âm thầm cập nhật từ Cloud (Chỉ tốn 1 request)
+        showLoading(50);
         try {
-            const res = await fetch(`${BASE_URL}/latest`, {
-                headers: { "X-Master-Key": MASTER_KEY }
-            });
-            const data = await res.json();
-            members = data.record;
-            // Cập nhật lại bộ nhớ máy
-            localStorage.setItem('cached_members', JSON.stringify(members));
+            const { data, error } = await supabaseClient
+                .from('members')
+                .select('*')
+                .order('streak', { ascending: false });
+
+            if (error) throw error;
+            membersArr = data;
             renderTable();
-            document.getElementById('sync-status').innerText = "CLOUD SYNCED ✅";
-            
-            if (savedPass && members[savedPass]) {
-                currentUser = savedPass;
-                document.getElementById('login-screen').style.display = 'none';
-                updateCountdown();
-                checkTime();
-            }
+            document.getElementById('sync-status').innerText = "Hệ thống Online ✅";
+            showLoading(100);
+            setTimeout(() => showLoading(0), 500);
         } catch (e) {
-            console.log("Offline mode - Dùng dữ liệu cũ");
+            document.getElementById('sync-status').innerText = "Lỗi đồng bộ! ❌";
+            console.error(e.message);
         }
     }
 
     function checkLogin() {
-        const pass = document.getElementById('pass-input').value;
-        if (members[pass]) {
-            currentUser = pass;
-            localStorage.setItem('user_pass', pass); 
-            document.getElementById('login-screen').style.display = 'none';
+        const pass = document.getElementById('pass-input').value.trim();
+        if (membersArr.length === 0) return;
+
+        const user = membersArr.find(m => String(m.id) === pass);
+        if (user) {
+            currentUser = user;
+            document.getElementById('login-screen').classList.add('hidden');
             updateCountdown();
             checkTime();
-        } else { alert("Sai mật mã!"); }
-    }
-
-    async function syncToCloud() {
-        document.getElementById('loading-bar').style.width = '50%';
-        try {
-            // Lưu vào máy trước cho chắc
-            localStorage.setItem('cached_members', JSON.stringify(members));
-            
-            // Đẩy lên Cloud
-            await fetch(BASE_URL, {
-                method: 'PUT',
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": MASTER_KEY
-                },
-                body: JSON.stringify(members)
-            });
-            document.getElementById('loading-bar').style.width = '100%';
-            setTimeout(() => document.getElementById('loading-bar').style.width = '0', 500);
-        } catch (e) { alert("Lỗi lưu Cloud!"); }
+        } else { 
+            alert("Mật mã chưa chính xác!"); 
+        }
     }
 
     function renderTable() {
         const body = document.getElementById('main-table-body');
         body.innerHTML = "";
-        Object.keys(members).forEach(id => {
-            const m = members[id];
+        
+        membersArr.forEach(m => {
             let cellsHtml = "";
-            for(let i=1; i<=TOTAL_DAYS; i++) {
-                let status = (m.done && m.done.includes(i)) ? "cell-done" : "";
-                cellsHtml += `<div class="cell ${status} ml-2">${i}</div>`;
+            for(let i = 1; i <= TOTAL_DAYS; i++) {
+                const isDone = Array.isArray(m.done) && m.done.includes(i);
+                cellsHtml += `<div class="cell ${isDone ? 'cell-done' : ''} ml-2">${i}</div>`;
             }
+            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="sticky-name">
-                    <div class="text-[14px] font-bold text-white uppercase">${m.name}</div>
-                    <div class="text-[11px] text-orange-500 font-black mt-1 ${m.streak > 0 ? 'fire-anim' : 'opacity-20'}">🔥 ${m.streak}</div>
+                    <div class="text-[13px] font-bold text-white uppercase tracking-tight">${m.name}</div>
+                    <div class="text-[11px] text-orange-500 font-black flex items-center gap-1 mt-0.5 ${m.streak > 0 ? 'fire-anim' : 'opacity-20'}">
+                        <span>🔥</span> ${m.streak} ngày
+                    </div>
                 </td>
-                <td class="flex py-1">${cellsHtml}</td>
+                <td class="flex items-center py-2">${cellsHtml}</td>
             `;
             body.appendChild(row);
         });
     }
 
     async function doCheckIn() {
+        if (!currentUser) return;
         const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
-        if (dayIndex <= 0) return alert("Chưa đến ngày!");
-        if (!members[currentUser].done) members[currentUser].done = [];
-        
-        if (!members[currentUser].done.includes(dayIndex)) {
-            members[currentUser].done.push(dayIndex);
-            members[currentUser].streak = (members[currentUser].streak || 0) + 1;
-            renderTable();
-            await syncToCloud();
-            alert(`Thành công! Streak: ${members[currentUser].streak} 🔥`);
-        } else { alert("Hôm nay xong rồi!"); }
+        if (dayIndex <= 0) return alert("Thử thách chưa bắt đầu!");
+
+        if (!Array.isArray(currentUser.done)) currentUser.done = [];
+        if (!currentUser.done.includes(dayIndex)) {
+            showLoading(50);
+            const { error } = await supabaseClient
+                .from('members')
+                .update({ done: [...currentUser.done, dayIndex], streak: (currentUser.streak || 0) + 1 })
+                .eq('id', currentUser.id);
+
+            if (!error) {
+                await loadData();
+                alert(`Tuyệt vời! Day ${dayIndex} hoàn tất. 🌟`);
+            }
+            showLoading(100);
+            setTimeout(() => showLoading(0), 500);
+        } else { 
+            alert("Bạn đã điểm danh hôm nay rồi!"); 
+        }
     }
 
+    function showLoading(pct) { document.getElementById('loading-bar').style.width = pct + '%'; }
+    
     function updateCountdown() {
         const diff = DEADLINE - new Date();
         document.getElementById('countdown-num').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
@@ -198,17 +247,17 @@
 
     function checkTime() {
         const now = new Date();
-        const h = now.getHours();
-        const m = now.getMinutes();
-        const totalM = h * 60 + m;
+        const totalM = now.getHours() * 60 + now.getMinutes();
         const btn = document.getElementById('btn-checkin');
-        const isOnTime = totalM >= 240 && totalM <= 315;
+        const isOnTime = totalM >= 240 && totalM <= 315; // 4:00 - 5:15
         btn.disabled = !isOnTime;
-        btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA ĐẾN GIỜ 🔥";
+        btn.innerText = isOnTime ? "ĐIỂM DANH 🔥" : "CHƯA TỚI GIỜ 🔥";
     }
 
-    loadData();
-    setInterval(checkTime, 30000);
+    window.onload = () => {
+        loadData();
+        setInterval(checkTime, 30000);
+    };
 </script>
 </body>
 </html>
