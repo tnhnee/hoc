@@ -130,6 +130,15 @@
     let membersArr = []; 
     let currentUser = null;
 
+    // Hàm lấy số thứ tự ngày hiện tại (Day 1, Day 2...)
+    function getCurrentDayIndex() {
+        const start = new Date(START_DATE);
+        start.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+    }
+
     async function loadData() {
         try {
             const { data, error } = await supabaseClient.from('members').select('*').limit(4);
@@ -137,7 +146,6 @@
             membersArr = data;
             renderList();
             if (currentUser) {
-                // Cập nhật lại currentUser từ data mới nhất để checkTime chính xác
                 currentUser = membersArr.find(m => String(m.id) === String(currentUser.id));
                 checkTime();
             }
@@ -147,9 +155,7 @@
     function renderList() {
         const list = document.getElementById('member-list');
         list.innerHTML = "";
-        const now = new Date();
-        const diffTime = now - START_DATE;
-        const currentDayIndex = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const currentDayIndex = getCurrentDayIndex();
 
         membersArr.forEach((m) => {
             const doneArr = Array.isArray(m.done) ? m.done : [];
@@ -179,56 +185,11 @@
         });
     }
 
-    function updateCountdown() {
-        const diff = DEADLINE - new Date();
-        if (diff <= 0) return;
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById('days').innerText = String(d).padStart(2, '0');
-        document.getElementById('hours').innerText = String(h).padStart(2, '0');
-        document.getElementById('mins').innerText = String(m).padStart(2, '0');
-        document.getElementById('secs').innerText = String(s).padStart(2, '0');
-    }
-
-    // Tự động đăng nhập nếu có lưu mã
-    async function checkAutoLogin() {
-        const savedPass = localStorage.getItem('study_pass');
-        if (savedPass) {
-            const user = membersArr.find(m => String(m.id) === savedPass);
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                startApp();
-            }
-        }
-    }
-
-    function checkLogin() {
-        const pass = document.getElementById('pass-input')?.value.trim();
-        const user = membersArr.find(m => String(m.id) === pass);
-        if (user) {
-            localStorage.setItem('study_pass', pass); // Lưu mã lại
-            currentUser = user;
-            document.getElementById('login-screen').style.display = 'none';
-            startApp();
-        } else { alert("Mật mã sai!"); }
-    }
-
-    function startApp() {
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-        checkTime();
-        setInterval(checkTime, 10000); 
-    }
-
     async function doCheckIn() {
         if (!currentUser) return;
-        const dayIndex = Math.ceil((new Date() - START_DATE) / (1000 * 60 * 60 * 24));
+        const dayIndex = getCurrentDayIndex();
         if (dayIndex <= 0) return alert("Chưa đến ngày bắt đầu!");
 
-        // Kiểm tra lại lần nữa trong mảng m.done của user để chắc chắn
         if (currentUser.done && currentUser.done.includes(dayIndex)) {
             alert("Bạn đã điểm danh hôm nay rồi!");
             return;
@@ -247,21 +208,17 @@
 
     function checkTime() {
         if (!currentUser) return;
-
         const now = new Date();
-        const diffTime = now - START_DATE;
-        const currentDayIndex = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const currentDayIndex = getCurrentDayIndex();
         
-        // Luôn dùng data mới nhất từ membersArr
         const latestUser = membersArr.find(m => m.id === currentUser.id);
         const doneArr = latestUser ? (latestUser.done || []) : [];
         const hasDoneToday = doneArr.includes(currentDayIndex);
 
         const totalM = now.getHours() * 60 + now.getMinutes();
-        const isOnTime = totalM >= 240 && totalM <= 315; 
+        const isOnTime = totalM >= 240 && totalM <= 315; // 4:00 - 5:15
         
         const btn = document.getElementById('btn-checkin');
-
         if (hasDoneToday) {
             btn.disabled = true;
             btn.innerText = "ĐÃ ĐIỂM DANH XONG";
@@ -272,7 +229,52 @@
         } else {
             btn.disabled = false;
             btn.innerText = "ĐIỂM DANH 🔥";
+            btn.style.background = "#0f172a";
         }
+    }
+    
+    // Các hàm phụ (updateCountdown, checkLogin, v.v.) giữ nguyên như cũ...
+    function updateCountdown() {
+        const diff = DEADLINE - new Date();
+        if (diff <= 0) return;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        document.getElementById('days').innerText = String(d).padStart(2, '0');
+        document.getElementById('hours').innerText = String(h).padStart(2, '0');
+        document.getElementById('mins').innerText = String(m).padStart(2, '0');
+        document.getElementById('secs').innerText = String(s).padStart(2, '0');
+    }
+
+    async function checkAutoLogin() {
+        const savedPass = localStorage.getItem('study_pass');
+        if (savedPass) {
+            const user = membersArr.find(m => String(m.id) === savedPass);
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').style.display = 'none';
+                startApp();
+            }
+        }
+    }
+
+    function checkLogin() {
+        const pass = document.getElementById('pass-input')?.value.trim();
+        const user = membersArr.find(m => String(m.id) === pass);
+        if (user) {
+            localStorage.setItem('study_pass', pass);
+            currentUser = user;
+            document.getElementById('login-screen').style.display = 'none';
+            startApp();
+        } else { alert("Mật mã sai!"); }
+    }
+
+    function startApp() {
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        checkTime();
+        setInterval(checkTime, 10000); 
     }
 
     window.onload = async () => { 
