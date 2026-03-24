@@ -243,7 +243,7 @@ function checkTime() {
 
     if (hasDoneToday) {
         btn.disabled = true;
-        btn.innerText = "ĐÃ ĐIỂM DANH ✅";
+        btn.innerText = "ĐÃ ĐIỂM DANH RỒI";
         btn.classList.replace('btn-checkin', 'bg-slate-200'); // Đổi màu nút cho đẹp
     } else if (!isOnTime) {
         btn.disabled = true;
@@ -251,7 +251,7 @@ function checkTime() {
         btn.style.backgroundColor = ""; // Reset về mặc định nếu cần
     } else {
         btn.disabled = false;
-        btn.innerText = "ĐIỂM DANH 🔥";
+        btn.innerText = "ĐIỂM DANH NGAY 🔥";
         btn.classList.add('btn-checkin');
     }
 }
