@@ -145,40 +145,48 @@
         } catch (e) { console.error(e); }
     }
 
-    function renderList() {
-        const list = document.getElementById('member-list');
-        list.innerHTML = "";
-        const now = new Date();
-        const diffTime = now - START_DATE;
-        const totalDaysPassed = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-        const currentDayIndex = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+function renderList() {
+    const list = document.getElementById('member-list');
+    list.innerHTML = "";
+    const now = new Date();
+    
+    // Tính số ngày tính từ ngày bắt đầu đến thời điểm hiện tại
+    const diffTime = now - START_DATE;
+    
+    // currentDayIndex: Ngày thứ bao nhiêu kể từ khi bắt đầu (Ngày 1, Ngày 2...)
+    const currentDayIndex = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        membersArr.forEach((m) => {
-            const doneArr = Array.isArray(m.done) ? m.done : [];
-            const isActiveToday = doneArr.includes(currentDayIndex);
-            let xCount = 0;
-            for (let i = 1; i <= totalDaysPassed; i++) {
-                if (!doneArr.includes(i)) xCount++;
+    membersArr.forEach((m) => {
+        const doneArr = Array.isArray(m.done) ? m.done : [];
+        const isActiveToday = doneArr.includes(currentDayIndex);
+        
+        let xCount = 0;
+        // Chạy vòng lặp từ ngày 1 đến ngày hiện tại (currentDayIndex)
+        for (let i = 1; i <= currentDayIndex; i++) {
+            // Nếu ngày i chưa có trong mảng điểm danh -> tính là 1 lỗi ❌
+            if (!doneArr.includes(i)) {
+                xCount++;
             }
+        }
 
-            const card = document.createElement('div');
-            card.className = `glass-card p-8 flex flex-col items-center justify-center gap-6 ${isActiveToday ? 'card-done' : ''}`;
-            card.innerHTML = `
-                <div class="text-[18px] font-black uppercase tracking-widest text-slate-800">${m.name}</div>
-                <div class="flex flex-col gap-3 w-full">
-                    <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
-                        <span class="text-2xl">🔥</span>
-                        <span class="text-3xl font-black text-orange-600">${m.streak || 0}</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
-                        <span class="text-2xl">❌</span>
-                        <span class="text-3xl font-black text-red-600">${xCount}</span>
-                    </div>
+        const card = document.createElement('div');
+        card.className = `glass-card p-8 flex flex-col items-center justify-center gap-6 ${isActiveToday ? 'card-done' : ''}`;
+        card.innerHTML = `
+            <div class="text-[18px] font-black uppercase tracking-widest text-slate-800">${m.name}</div>
+            <div class="flex flex-col gap-3 w-full">
+                <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
+                    <span class="text-2xl">🔥</span>
+                    <span class="text-3xl font-black text-orange-600">${m.streak || 0}</span>
                 </div>
-            `;
-            list.appendChild(card);
-        });
-    }
+                <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl px-6 border border-slate-200">
+                    <span class="text-2xl">❌</span>
+                    <span class="text-3xl font-black text-red-600">${xCount}</span>
+                </div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
 
     function updateCountdown() {
         const diff = DEADLINE - new Date();
